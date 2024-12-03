@@ -1,8 +1,10 @@
 const clearButton = document.getElementById('clear');
 const container = document.getElementById('numHolder');
+const read = document.getElementById('read');
 
 let memory = ['','',undefined];
 
+clearButton.addEventListener('click', () => clear())
 container.addEventListener('click', (event) => {
     if(event.target.matches('.row')) return;
     let type = getType(event.target.innerText)[0];
@@ -10,16 +12,25 @@ container.addEventListener('click', (event) => {
 
     if(type === 'number' && !memory[2]) {
         memory[0] += value;
+        read.innerText = memory[0];
     } else if(type === 'decimal' && !memory[2]) {
         memory[0] += value;
+        read.innerText = memory[0];
     } else if(type === 'operator') {
         memory[2] = value;
+        read.innerText = 0;
     } else if(type === 'number' && memory[2]) {
         memory[1] += value;
+        read.innerText = memory[1];
     } else if(type === 'decimal' && memory[2]) {
         memory[1] += value;
+        read.innerText = memory[1];
     } else if(type === 'equals') {
-        calculate(memory);
+        let ans = calculate(memory);
+        console.log(`ans = ${ans}`);
+        memory[0] = calculate(memory);
+        read.innerText = memory[0];
+        // clear();
     }
     console.log(memory)
 });
@@ -37,14 +48,29 @@ function getType(val) {
         return ['decimal', val];
     }
 };
-function calculate(memory) {
-    let num1 = Number(memory[0]);
-    let num2 = Number(memory[1]);
-    let operator = memory[2];
-    console.log(num1,num2,operator);
-}
+function calculate(mem) {
+    let num1 = Number(mem[0]);
+    let num2 = Number(mem[1]);
+    let operator = mem[2];
+    console.log('YESSISSSRRR',num1,num2,operator)
 
-clearButton.addEventListener('click', () => {
+    if(operator === '+') {
+        return num1 + num2;
+    } else if(operator === '-') {
+        return num1 - num2;
+    } else if(operator === '*') {
+        return num1 * num2;
+    } else if(operator === '/') {
+        if(num2 === 0) {
+            return 'ERROR';
+        } else if(num1 === 0 && num1 !== 0) {
+            return 0;
+        }
+        return num1 / num2;
+    }
+};
+function clear() {
     memory = ['','',undefined];
+    read.innerText = '0';
     console.log(memory);
-});
+};
