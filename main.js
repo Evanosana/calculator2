@@ -12,12 +12,18 @@ container.addEventListener('click', (event) => { // Grabs all button presses in 
     let type = getType(event.target.innerText)[0];
     let value = getType(event.target.innerText)[1];
 
+    // Clears the field after an error occurred
+    if(memory[0] === 'ERROR') {
+        clear();
+    }
     // Places the input in its designated slot in memory
     if(type === 'number' && !memory[2]) {
         memory[0] += value;
         read.innerText = memory[0];
     } else if(type === 'decimal' && !memory[2]) {
-        memory[0] += value;
+        if(!memory[0].includes('.')) {
+            memory[0] += value;
+        }
         read.innerText = memory[0];
     } else if(type === 'operator') {
         memory[2] = value;
@@ -26,11 +32,11 @@ container.addEventListener('click', (event) => { // Grabs all button presses in 
         memory[1] += value;
         read.innerText = memory[1];
     } else if(type === 'decimal' && memory[2]) {
-        memory[1] += value;
+        if(!memory[1].includes('.')) {
+            memory[1] += value;
+        }
         read.innerText = memory[1];
     } else if(type === 'equals') { 
-        let ans = calculate(memory);
-        console.log(`ans = ${ans}`);
         memory[0] = calculate(memory);
         read.innerText = memory[0];
     }
@@ -56,7 +62,10 @@ function calculate(mem) {
     let num2 = Number(mem[1]);
     let operator = mem[2];
 
-    if(operator === '+') {
+    if(!num1 || !num2) {
+        console.error('Not enough values');
+        return 'ERROR';
+    } else if(operator === '+') {
         return num1 + num2;
     } else if(operator === '-') {
         return num1 - num2;
@@ -65,6 +74,7 @@ function calculate(mem) {
     } else if(operator === '/') {
         // Checks if the demoninator is 0 and returns ERROR, If that test is passed then if the numerator is 0 then return 0
         if(num2 === 0) {
+            console.error('Cannot divide by 0');
             return 'ERROR';
         } else if(num1 === 0 && num1 !== 0) {
             return 0;
